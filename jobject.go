@@ -15,7 +15,7 @@ func PruseJSON(data string) *jObject {
 	return nil
 }
 
-func (v *jObject) jToken(key string) *jObject {
+func (v *jObject) JToken(key string) *jObject {
 	t, ok := (*v)[key]
 	if ok {
 		if m, ok := t.(map[string]interface{}); ok {
@@ -36,7 +36,7 @@ func (v *jObject) jArray(key string) []interface{} {
 	return nil
 }
 
-func (v *jObject) jTokens(key string) []*jObject {
+func (v *jObject) JTokens(key string) []*jObject {
 	t := v.jArray(key)
 	if t != nil {
 		r := make([]*jObject, 0)
