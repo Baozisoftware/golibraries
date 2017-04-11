@@ -1,4 +1,4 @@
-package jobject
+package json
 
 import "encoding/json"
 
