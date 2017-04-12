@@ -19,21 +19,14 @@ type HttpClient struct {
 	client http.Client
 }
 
-func NewHttpClientWithTimeout(timeout int) *HttpClient {
-	if timeout <= 0 {
-		timeout = 0
-	}
+func NewHttpClient() *HttpClient {
 	tr := &http.Transport{
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
 		DisableCompression: true,
 	}
 	jar, _ := cookiejar.New(nil)
-	client := http.Client{Transport: tr, Jar: jar, Timeout: time.Second * time.Duration(timeout)}
+	client := http.Client{Transport: tr, Jar: jar}
 	return &HttpClient{client}
-}
-
-func NewHttpClient() *HttpClient {
-	return NewHttpClientWithTimeout(0)
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
@@ -135,4 +128,11 @@ func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 	resp, err = i.client.Do(req)
 	return
+}
+
+func (i *HttpClient) SetTimeout(timeout int) {
+	if timeout <= 0 {
+		timeout = 0
+	}
+	i.client.Timeout = time.Second * time.Duration(timeout)
 }
