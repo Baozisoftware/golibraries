@@ -19,13 +19,16 @@ type HttpClient struct {
 	client http.Client
 }
 
-func NewHttpClient() *HttpClient {
+func NewHttpClient(timeout int) *HttpClient {
+	if timeout <= 0 {
+		timeout = 0
+	}
 	tr := &http.Transport{
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
 		DisableCompression: true,
 	}
 	jar, _ := cookiejar.New(nil)
-	client := http.Client{Transport: tr, Jar: jar, Timeout: time.Second * 30}
+	client := http.Client{Transport: tr, Jar: jar, Timeout: time.Second * time.Duration(timeout)}
 	return &HttpClient{client}
 }
 
