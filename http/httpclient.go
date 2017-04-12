@@ -19,7 +19,7 @@ type HttpClient struct {
 	client http.Client
 }
 
-func NewHttpClient(timeout int) *HttpClient {
+func NewHttpClientWithTimeout(timeout int) *HttpClient {
 	if timeout <= 0 {
 		timeout = 0
 	}
@@ -30,6 +30,10 @@ func NewHttpClient(timeout int) *HttpClient {
 	jar, _ := cookiejar.New(nil)
 	client := http.Client{Transport: tr, Jar: jar, Timeout: time.Second * time.Duration(timeout)}
 	return &HttpClient{client}
+}
+
+func NewHttpClient() *HttpClient {
+	return NewHttpClientWithTimeout(0)
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
