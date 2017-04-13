@@ -2,31 +2,31 @@ package json
 
 import "encoding/json"
 
-type jObject map[string]interface{}
+type JObject map[string]interface{}
 
-func PruseJSON(data string) *jObject {
+func PruseJSON(data string) *JObject {
 	var o interface{}
 	if json.Unmarshal([]byte(data), &o) == nil {
 		if m, ok := o.(map[string]interface{}); ok {
-			j := jObject(m)
+			j := JObject(m)
 			return &j
 		}
 	}
 	return nil
 }
 
-func (v *jObject) JToken(key string) *jObject {
+func (v *JObject) JToken(key string) *JObject {
 	t, ok := (*v)[key]
 	if ok {
 		if m, ok := t.(map[string]interface{}); ok {
-			j := jObject(m)
+			j := JObject(m)
 			return &j
 		}
 	}
 	return nil
 }
 
-func (v *jObject) jArray(key string) []interface{} {
+func (v *JObject) jArray(key string) []interface{} {
 	t, ok := (*v)[key]
 	if ok {
 		if m, ok := t.([]interface{}); ok {
@@ -36,13 +36,13 @@ func (v *jObject) jArray(key string) []interface{} {
 	return nil
 }
 
-func (v *jObject) JTokens(key string) []*jObject {
+func (v *JObject) JTokens(key string) []*JObject {
 	t := v.jArray(key)
 	if t != nil {
-		r := make([]*jObject, 0)
+		r := make([]*JObject, 0)
 		for _, v := range t {
 			if m, ok := v.(map[string]interface{}); ok {
-				j := jObject(m)
+				j := JObject(m)
 				r = append(r, &j)
 			}
 		}
