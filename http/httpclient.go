@@ -136,3 +136,18 @@ func (i *HttpClient) SetTimeout(timeout int) {
 	}
 	i.client.Timeout = time.Second * time.Duration(timeout)
 }
+
+func (i *HttpClient) SetProxy(url string) {
+	if url == "" {
+		http.Transport(i.client.Transport).Proxy = nil
+	} else {
+		u, err := nurl.Parse(url)
+		if err == nil {
+			http.Transport(i.client.Transport).Proxy = func(*http.Request) (*nurl.URL, error) {
+				return u, nil
+			}
+		} else {
+			http.Transport(i.client.Transport).Proxy = nil
+		}
+	}
+}
