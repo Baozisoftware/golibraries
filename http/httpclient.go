@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -16,7 +17,8 @@ import (
 const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
 
 type HttpClient struct {
-	client http.Client
+	client      http.Client
+	readTimeout int
 }
 
 func NewHttpClient() *HttpClient {
@@ -26,7 +28,7 @@ func NewHttpClient() *HttpClient {
 	}
 	jar, _ := cookiejar.New(nil)
 	client := http.Client{Transport: tr, Jar: jar}
-	return &HttpClient{client}
+	return &HttpClient{client, 0}
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
@@ -157,4 +159,33 @@ func (i *HttpClient) SetProxy(url string) {
 			i.client.Transport.(*http.Transport).Proxy = nil
 		}
 	}
+}
+
+func (i *HttpClient) SetReadBodyTimeout(timeout int) {
+	if timeout <= 0 {
+		timeout = 0
+	}
+	i.readTimeout = timeout
+}
+
+func (i *HttpClient) ReadBodyWithTimeOut(resp *http.Response) (data []byte, err error) {
+	if resp == nil {
+		return nil, errors.New("resp is nil.")
+	}
+	ch := make(chan bool, 0)
+	buf := make([]byte, bytes.MinRead)
+	var t int
+	timer := time.NewTimer(time.Second * time.Duration(i.readTimeout))
+	go func() {
+		t, err = resp.Body.Read(buf)
+		data = buf[:t]
+		ch <- true
+	}()
+	select {
+	case <-ch:
+	case <-timer.C:
+		err = errors.New("readbody timeout.")
+	}
+	timer.Stop()
+	return
 }
