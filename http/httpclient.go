@@ -181,10 +181,14 @@ func (i *HttpClient) ReadBodyWithTimeOut(resp *http.Response) (data []byte, err 
 		data = buf[:t]
 		ch <- true
 	}()
-	select {
-	case <-ch:
-	case <-timer.C:
-		err = errors.New("readbody timeout.")
+	if i.readTimeout > 0 {
+		select {
+		case <-ch:
+		case <-timer.C:
+			err = errors.New("readbody timeout.")
+		}
+	} else {
+		<-ch
 	}
 	timer.Stop()
 	return
