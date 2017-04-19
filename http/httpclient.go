@@ -168,7 +168,7 @@ func (i *HttpClient) SetReadBodyTimeout(timeout int) {
 	i.readTimeout = timeout
 }
 
-func (i *HttpClient) ReadBodyWithTimeOut(resp *http.Response) (data []byte, err error) {
+func (i *HttpClient) ReadBodyWithTimeout(resp *http.Response) (data []byte, err error) {
 	if resp == nil {
 		return nil, errors.New("resp is nil.")
 	}
