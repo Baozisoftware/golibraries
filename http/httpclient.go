@@ -137,6 +137,13 @@ func (i *HttpClient) SetTimeout(timeout int) {
 	i.client.Timeout = time.Second * time.Duration(timeout)
 }
 
+func (i *HttpClient) SetResponseHeaderTimeout(timeout int) {
+	if timeout <= 0 {
+		timeout = 0
+	}
+	i.client.Transport.(*http.Transport).ResponseHeaderTimeout = time.Second * time.Duration(timeout)
+}
+
 func (i *HttpClient) SetProxy(url string) {
 	if url == "" {
 		i.client.Transport.(*http.Transport).Proxy = nil
