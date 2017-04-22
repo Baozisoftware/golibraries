@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	nurl "net/url"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
@@ -192,4 +193,13 @@ func (i *HttpClient) ReadBodyWithTimeout(resp *http.Response) (data []byte, err 
 	}
 	timer.Stop()
 	return
+}
+
+func init() {
+	go func() {
+		for {
+			time.Sleep(time.Minute * 2)
+			debug.FreeOSMemory()
+		}
+	}()
 }
