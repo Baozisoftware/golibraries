@@ -30,6 +30,11 @@ func (v *JObject) jArray(key string) []interface{} {
 	t, ok := (*v)[key]
 	if ok {
 		if m, ok := t.([]interface{}); ok {
+			if len(m) == 1 {
+				if x, ok := m[0].([]interface{}); ok {
+					return x
+				}
+			}
 			return m
 		}
 	}
