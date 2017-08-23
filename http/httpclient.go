@@ -3,23 +3,22 @@ package http
 import (
 	"bytes"
 	"crypto/tls"
-	"errors"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/cookiejar"
 	nurl "net/url"
-	"runtime/debug"
 	"strconv"
 	"strings"
 	"time"
+	"net"
+	"context"
 )
 
 const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
 
 type HttpClient struct {
-	client      http.Client
-	readTimeout int
+	client http.Client
 }
 
 func NewHttpClient() *HttpClient {
@@ -29,7 +28,7 @@ func NewHttpClient() *HttpClient {
 	}
 	jar, _ := cookiejar.New(nil)
 	client := http.Client{Transport: tr, Jar: jar}
-	return &HttpClient{client, 0}
+	return &HttpClient{client}
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
@@ -162,44 +161,19 @@ func (i *HttpClient) SetProxy(url string) {
 	}
 }
 
-func (i *HttpClient) SetReadBodyTimeout(timeout int) {
-	if timeout <= 0 {
-		timeout = 0
-	}
-	i.readTimeout = timeout
-}
-
-func (i *HttpClient) ReadBodyWithTimeout(resp *http.Response) (data []byte, err error) {
-	if resp == nil {
-		return nil, errors.New("resp is nil.")
-	}
-	ch := make(chan bool, 0)
-	buf := make([]byte, bytes.MinRead)
-	var t int
-	timer := time.NewTimer(time.Second * time.Duration(i.readTimeout))
-	go func() {
-		t, err = resp.Body.Read(buf)
-		data = buf[:t]
-		ch <- true
-	}()
-	if i.readTimeout > 0 {
-		select {
-		case <-ch:
-		case <-timer.C:
-			err = errors.New("readbody timeout.")
+func (i *HttpClient) SetBodyTimeout(timeout int) {
+	if timeout > 0 {
+		i.client.Transport.(*http.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
+			tot := time.Second * time.Duration(timeout)
+			conn, err := net.DialTimeout(netw, addr, tot)
+			if err != nil {
+				return nil, err
+			}
+			return newTimeoutConn(conn, tot), nil
 		}
 	} else {
-		<-ch
-	}
-	timer.Stop()
-	return
-}
-
-func init() {
-	go func() {
-		for {
-			time.Sleep(time.Minute * 2)
-			debug.FreeOSMemory()
+		i.client.Transport.(*http.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
+			return net.Dial(netw, addr)
 		}
-	}()
+	}
 }
