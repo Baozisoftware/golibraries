@@ -1,6 +1,8 @@
 package json
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type JObject map[string]interface{}
 
@@ -36,6 +38,14 @@ func (v *JObject) jArray(key string) []interface{} {
 				}
 			}
 			return m
+		} else if t, ok := t.(map[string]interface{}); ok {
+			r := make([]interface{}, 0)
+			for _, v := range t {
+				if m, ok := v.(map[string]interface{}); ok {
+					r = append(r, m)
+				}
+			}
+			return r
 		}
 	}
 	return nil
