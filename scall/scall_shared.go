@@ -26,3 +26,11 @@ func CreateFile(filepath string) (file *os.File, err error) {
 	}
 	return
 }
+
+func OpenFile(filepath string) (file *os.File, err error) {
+	file, err = os.Open(filepath)
+	if err != nil {
+		file, err = CreateFile(filepath)
+	}
+	return
+}
