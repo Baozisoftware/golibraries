@@ -4,6 +4,8 @@ import (
 	"os/exec"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -31,6 +33,16 @@ func OpenFile(filepath string) (file *os.File, err error) {
 	file, err = os.Open(filepath)
 	if err != nil {
 		file, err = CreateFile(filepath)
+	}
+	return
+}
+
+func SplitFileName(p string) (dir, name, ext, namewithoutext string) {
+	dir, name = filepath.Split(p)
+	ext = filepath.Ext(name)
+	n := strings.LastIndex(name, ".")
+	if n > 0 {
+		namewithoutext = name[:n]
 	}
 	return
 }
