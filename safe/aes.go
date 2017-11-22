@@ -4,7 +4,6 @@ import (
 	"crypto/cipher"
 	"crypto/aes"
 	"bytes"
-	"errors"
 	"encoding/base64"
 )
 
@@ -64,33 +63,44 @@ func (x *ecbDecrypter) CryptBlocks(dst, src []byte) {
 	}
 }
 
-func AesDecrypt(dst, key string) (str string, err error) {
+func AesEncrypt(src, key []byte) (crypted []byte, err error) {
+	block, err := aes.NewCipher(key)
+	if err == nil {
+		ecb := newECBEncrypter(block)
+		content := pkcs5Padding(src, block.BlockSize())
+		crypted = make([]byte, len(content))
+		ecb.CryptBlocks(crypted, content)
+	}
+	return
+}
+
+func AesDecrypt(dst, key []byte) (origData []byte, err error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err == nil {
 		blockMode := newECBDecrypter(block)
-		crypted, err := base64.StdEncoding.DecodeString(dst)
-		origData := make([]byte, len(crypted))
+		origData = make([]byte, len(dst))
 		if err == nil {
-			blockMode.CryptBlocks(origData, crypted)
+			blockMode.CryptBlocks(origData, dst)
 			origData = pkcs5UnPadding(origData)
-			str = string(origData)
 		}
 	}
 	return
 }
 
-func AesEncrypt(src, key string) (str string, err error) {
-	if src == "" {
-		err = errors.New("plain content empty")
-	} else {
-		block, err := aes.NewCipher([]byte(key))
+func AesEncryptString(src, key string) (str string, err error) {
+	data, err := AesEncrypt([]byte(src), []byte(key))
+	if err == nil {
+		str = base64.StdEncoding.EncodeToString(data)
+	}
+	return
+}
+
+func AesDecryptString(dst, key string) (str string, err error) {
+	data, err := base64.StdEncoding.DecodeString(dst)
+	if err == nil {
+		data, err = AesDecrypt(data, []byte(key))
 		if err == nil {
-			ecb := newECBEncrypter(block)
-			content := []byte(src)
-			content = pkcs5Padding(content, block.BlockSize())
-			crypted := make([]byte, len(content))
-			ecb.CryptBlocks(crypted, content)
-			str = base64.StdEncoding.EncodeToString(crypted)
+			str = string(data)
 		}
 	}
 	return
