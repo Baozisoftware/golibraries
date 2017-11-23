@@ -47,10 +47,11 @@ func SplitFileName(p string) (dir, name, ext, namewithoutext string) {
 	return
 }
 
-func GetExecutable() (dir, name, ext, namewithoutext string) {
+func GetExecutable() (full, dir, name, ext, namewithoutext string) {
 	p, err := os.Executable()
 	if err == nil {
-		return SplitFileName(p)
+		full = p
+		dir, name, ext, namewithoutext = SplitFileName(p)
 	}
 	return
 }
