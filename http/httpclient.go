@@ -152,9 +152,7 @@ func (i *HttpClient) SetProxy(url string) {
 	} else {
 		u, err := nurl.Parse(url)
 		if err == nil {
-			i.client.Transport.(*http.Transport).Proxy = func(*http.Request) (*nurl.URL, error) {
-				return u, nil
-			}
+			i.client.Transport.(*http.Transport).Proxy = http.ProxyURL(u)
 		} else {
 			i.client.Transport.(*http.Transport).Proxy = nil
 		}
