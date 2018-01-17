@@ -67,9 +67,11 @@ func AesEncrypt(src, key []byte) (crypted []byte, err error) {
 	block, err := aes.NewCipher(key)
 	if err == nil {
 		ecb := newECBEncrypter(block)
-		content := pkcs5Padding(src, block.BlockSize())
-		crypted = make([]byte, len(content))
-		ecb.CryptBlocks(crypted, content)
+		content, err := pkcs5Padding(src, block.BlockSize())
+		if err == nil {
+			crypted = make([]byte, len(content))
+			ecb.CryptBlocks(crypted, content)
+		}
 	}
 	return
 }
@@ -81,7 +83,7 @@ func AesDecrypt(dst, key []byte) (origData []byte, err error) {
 		origData = make([]byte, len(dst))
 		if err == nil {
 			blockMode.CryptBlocks(origData, dst)
-			origData = pkcs5UnPadding(origData)
+			origData, err = pkcs5UnPadding(origData)
 		}
 	}
 	return
@@ -106,14 +108,28 @@ func AesDecryptString(dst, key string) (str string, err error) {
 	return
 }
 
-func pkcs5Padding(ciphertext []byte, blockSize int) []byte {
+func pkcs5Padding(ciphertext []byte, blockSize int) (data []byte, err error) {
+	defer func() {
+		t := recover()
+		if t != nil {
+			err = t.(error)
+		}
+	}()
 	padding := blockSize - len(ciphertext)%blockSize
 	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(ciphertext, padtext...)
+	data = append(ciphertext, padtext...)
+	return
 }
 
-func pkcs5UnPadding(origData []byte) []byte {
+func pkcs5UnPadding(origData []byte) (data []byte, err error) {
+	defer func() {
+		t := recover()
+		if t != nil {
+			err = t.(error)
+		}
+	}()
 	length := len(origData)
 	unpadding := int(origData[length-1])
-	return origData[:(length - unpadding)]
+	data = origData[:length-unpadding]
+	return
 }
