@@ -65,3 +65,10 @@ func (v *JObject) JTokens(key string) []*JObject {
 	}
 	return nil
 }
+
+func (v *JObject) String() string {
+	if s, err := json.Marshal(v); err == nil {
+		return string(s)
+	}
+	return ""
+}
