@@ -94,13 +94,13 @@ func CopyFile(src, dst string) error {
 func CopyFolder(src, dst string) error {
 	e, f := FileOrFolderExists(src)
 	if !e {
-		return errors.New("src is not exists.")
+		return errors.New("src is not exists")
 	}
 	if !f {
-		return errors.New("src is not folder.")
+		return errors.New("src is not folder")
 	}
 	if CreateDir(dst) != nil {
-		return errors.New("faild to create dst folder.")
+		return errors.New("faild to create dst folder")
 	}
 	s := len(src)
 	return filepath.Walk(src, func(path string, f os.FileInfo, err error) error {
