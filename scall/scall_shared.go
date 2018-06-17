@@ -7,6 +7,7 @@ import (
 	"strings"
 	"io"
 	"errors"
+	"fmt"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -67,7 +68,7 @@ func FileOrFolderExists(path string) (exists bool, isFolder bool) {
 	return
 }
 
-func CopyFile(src, dst string) error {
+func copyFile(src, dst string) error {
 	e, f := FileOrFolderExists(src)
 	if !e {
 		return errors.New("src is not exists.")
@@ -75,7 +76,10 @@ func CopyFile(src, dst string) error {
 	if f {
 		return errors.New("src is not file.")
 	}
-
+	if _, n, _, _ := SplitFileName(dst); n == "" {
+		_, n, _, _ = SplitFileName(src)
+		dst = fmt.Sprintf("%s/%s", dst, n)
+	}
 	sf, err := OpenFile(src)
 	if err != nil {
 		return err
@@ -91,7 +95,7 @@ func CopyFile(src, dst string) error {
 	return err
 }
 
-func CopyFolder(src, dst string) error {
+func copyFolder(src, dst string) error {
 	e, f := FileOrFolderExists(src)
 	if !e {
 		return errors.New("src is not exists")
@@ -103,6 +107,13 @@ func CopyFolder(src, dst string) error {
 		return errors.New("faild to create dst folder")
 	}
 	s := len(src)
+	if _, n, _, _ := SplitFileName(dst); n == "" {
+		_, n, _, _ = SplitFileName(src)
+		if n == "" {
+			_, n, _, _ = SplitFileName(src[:len(src)-1])
+		}
+		dst = fmt.Sprintf("%s/%s", dst, n)
+	}
 	return filepath.Walk(src, func(path string, f os.FileInfo, err error) error {
 		if f == nil {
 			return err
@@ -110,6 +121,25 @@ func CopyFolder(src, dst string) error {
 		if f.IsDir() {
 			return nil
 		}
-		return CopyFile(path, dst+path[s:])
+		return copyFile(path, dst+"/"+path[s:])
 	})
+}
+
+func CopyFileOrFolder(src, dst string) error {
+	e, f := FileOrFolderExists(src)
+	if !e {
+		return errors.New("src is not exists")
+	}
+	if !f {
+		return copyFile(src, dst)
+	}
+	return copyFolder(src, dst)
+}
+
+func MoveFileOrFolder(src, dst string) error {
+	err := CopyFileOrFolder(src, dst)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(src)
 }
