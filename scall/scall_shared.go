@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"crypto/md5"
 	"encoding/hex"
+	"regexp"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -186,4 +187,20 @@ func EachPath(path string, cb func(string) bool) error {
 		}
 		return errors.New("call cb return false")
 	})
+}
+
+func FilterPath(path, expr string) (list []string, err error) {
+	list = make([]string, 0)
+	reg, e := regexp.Compile(expr)
+	if e != nil {
+		err = e
+		return
+	}
+	err = EachPath(path, func(path string) bool {
+		if expr == "" || reg.MatchString(path) {
+			list = append(list, path)
+		}
+		return true
+	})
+	return
 }
