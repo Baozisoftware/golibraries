@@ -8,6 +8,8 @@ import (
 	"io"
 	"errors"
 	"fmt"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -71,10 +73,10 @@ func FileOrFolderExists(path string) (exists bool, isFolder bool) {
 func copyFile(src, dst string) error {
 	e, f := FileOrFolderExists(src)
 	if !e {
-		return errors.New("src is not exists.")
+		return errors.New("src is not exists")
 	}
 	if f {
-		return errors.New("src is not file.")
+		return errors.New("src is not file")
 	}
 	if _, n, _, _ := SplitFileName(dst); n == "" {
 		_, n, _, _ = SplitFileName(src)
@@ -142,4 +144,31 @@ func MoveFileOrFolder(src, dst string) error {
 		return err
 	}
 	return os.RemoveAll(src)
+}
+
+func GetFileMD5(path string) (string, error) {
+	e, f := FileOrFolderExists(path)
+	if !e {
+		return "", errors.New("path is not exists")
+	}
+	if f {
+		return "", errors.New("path is not file")
+	}
+	file, err := OpenFile(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	hash := md5.New()
+	buf := make([]byte, md5.BlockSize<<20)
+	for {
+		if n, err := file.Read(buf); err == nil {
+			hash.Write(buf[:n])
+		} else if n == 0 {
+			break
+		} else {
+			return "", err
+		}
+	}
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }
