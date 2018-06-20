@@ -31,11 +31,12 @@ func GetPercentage(v, m, a int) float64 {
 
 func GetPercentageString(v, m, a int, s bool) string {
 	x := GetPercentage(v, m, a)
+	f := fmt.Sprintf("%%.%df", a)
 	if x > 0 {
 		if s {
-			return fmt.Sprintf("%v%%", x)
+			return fmt.Sprintf(f, x)
 		}
-		return fmt.Sprintf("%f%", x)
+		return fmt.Sprintf(f, x)
 	}
 	return ""
 }
