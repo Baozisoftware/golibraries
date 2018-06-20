@@ -34,8 +34,7 @@ func GetPercentageString(v, m, a int, s bool) string {
 	f := fmt.Sprintf("%%.%df", a)
 	if x > 0 {
 		if s {
-			f = fmt.Sprintf("%%.%df%%", a)
-			return fmt.Sprintf(f, x)
+			return fmt.Sprintf(f, x) + "%"
 		}
 		return fmt.Sprintf(f, x)
 	}
