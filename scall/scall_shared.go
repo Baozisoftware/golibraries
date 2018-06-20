@@ -172,3 +172,18 @@ func GetFileMD5(path string) (string, error) {
 	}
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }
+
+func EachPath(path string, cb func(string) bool) error {
+	return filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if f == nil {
+			return err
+		}
+		if f.IsDir() {
+			return nil
+		}
+		if cb(path) {
+			return nil
+		}
+		return errors.New("call cb return false")
+	})
+}
