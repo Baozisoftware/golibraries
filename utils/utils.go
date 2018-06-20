@@ -19,7 +19,7 @@ func GetRandomString(l int) string {
 }
 
 func GetPercentage(v, m, a int) float64 {
-	x := float64(v) / float64(m)
+	x := float64(v) / float64(m) * 100
 	f := fmt.Sprintf("%%.%df", a)
 	t := fmt.Sprintf(f, x)
 	x, err := strconv.ParseFloat(t, 10)
@@ -33,9 +33,9 @@ func GetPercentageString(v, m, a int, s bool) string {
 	x := GetPercentage(v, m, a)
 	if x > 0 {
 		if s {
-			return fmt.Sprintf("%v%%",x)
+			return fmt.Sprintf("%v%%", x)
 		}
-		return fmt.Sprintf("%f%",x)
+		return fmt.Sprintf("%f%", x)
 	}
 	return ""
 }
