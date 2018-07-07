@@ -137,7 +137,7 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 		if len(v) != 2 {
 			return false
 		}
-		t = append(t, &http.Cookie{Name: v[0], Value: v[1]})
+		t = append(t, &http.Cookie{Name: v[0], Value: v[1],Expires:time.Now().AddDate(1,0,0),Path:"/"})
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
