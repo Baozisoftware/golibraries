@@ -125,6 +125,28 @@ func (i *HttpClient) GetCookie(url, name string) string {
 	return ""
 }
 
+func (i *HttpClient) SetCookies(url, cookies string) bool {
+	u, err := nurl.Parse(url)
+	if err != nil {
+		return false
+	}
+	t := make([]*http.Cookie, 0)
+	cks := strings.Split(cookies, ";")
+	for _, c := range cks {
+		v := strings.Split(c, "=")
+		if len(v) != 2 {
+			return false
+		}
+		t = append(t, &http.Cookie{Name: v[0], Value: v[1]})
+	}
+	i.client.Jar.SetCookies(u, t)
+	return true
+}
+
+func (i *HttpClient) SetCookie(url, name, value string) bool {
+	return i.SetCookies(url, fmt.Sprintf("%s=%s", name, value))
+}
+
 func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", ua)
