@@ -11,11 +11,26 @@ func GetRandomString(l int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
 	var result []byte
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	lstr := len(str) - 1
 	for i := 0; i < l; i++ {
-		result = append(result, bytes[r.Intn(len(bytes))])
+		n := GetRandomInt(0, lstr)
+		result = append(result, bytes[n])
 	}
 	return string(result)
+}
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func GetRandomIntN(n int) int {
+	return r.Intn(n)
+}
+
+func GetRandomInt(min, max int) int {
+	sub := max - min + 1
+	if sub <= 1 {
+		return min
+	}
+	return min + GetRandomIntN(sub)
 }
 
 func GetPercentage(v, m, a int) float64 {

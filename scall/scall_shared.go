@@ -11,6 +11,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"regexp"
+	"io/ioutil"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -202,5 +203,25 @@ func FilterPath(path, expr string) (list []string, err error) {
 		}
 		return true
 	})
+	return
+}
+
+func ReadFileAllLines(filepath string) (lines []string, err error) {
+	file, err := os.Open(filepath)
+	if err == nil {
+		data, err := ioutil.ReadAll(file)
+		if err == nil {
+			str := string(data)
+			s := ""
+			if strings.Contains(str, "\r\n") {
+				s = "\r\n"
+			} else if strings.Contains(str, "\r") {
+				s = "\r"
+			} else if strings.Contains(str, "\n") {
+				s = "\n"
+			}
+			lines = strings.Split(str, s)
+		}
+	}
 	return
 }
