@@ -2,6 +2,8 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
+	"strings"
 )
 
 type JObject map[string]interface{}
@@ -71,4 +73,20 @@ func (v *JObject) String() string {
 		return string(s)
 	}
 	return ""
+}
+
+func JTokensToString(jTokens []*JObject) string {
+	arr := make([]string, 0)
+	for _, v := range jTokens {
+		arr = append(arr, v.String())
+	}
+	return fmt.Sprintf("[%s]", strings.Join(arr, ","))
+}
+
+func (v *JObject) Unmarshal(p interface{}) error {
+	return json.Unmarshal([]byte(v.String()), p)
+}
+
+func UnmarshalJTokens(jTokens []*JObject, p interface{}) error {
+	return json.Unmarshal([]byte(JTokensToString(jTokens)), p)
 }
