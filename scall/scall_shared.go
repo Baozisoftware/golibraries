@@ -1,17 +1,18 @@
 package scall
 
 import (
-	"os/exec"
-	"os"
-	"path/filepath"
-	"strings"
-	"io"
-	"errors"
-	"fmt"
 	"crypto/md5"
 	"encoding/hex"
-	"regexp"
+	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"strings"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -29,7 +30,12 @@ func CreateDir(dirpath string) error {
 
 func CreateFile(fp string) (file *os.File, err error) {
 	dir, _ := filepath.Split(fp)
-	err = CreateDir(dir)
+	if dir != "" {
+		err = CreateDir(dir)
+		if err != nil {
+			return
+		}
+	}
 	if err == nil {
 		file, err = os.Create(fp)
 	}
@@ -221,6 +227,32 @@ func ReadFileAllLines(filepath string) (lines []string, err error) {
 				s = "\n"
 			}
 			lines = strings.Split(str, s)
+		}
+	}
+	return
+}
+
+func WriteAllLinesToFile(fp string, lines []string) (err error) {
+	if err == nil {
+		s := "\n"
+		switch runtime.GOOS {
+		case "darwin":
+			s = "\r"
+			break
+		case "windows":
+			s = "\r\n"
+			break
+		}
+		data := strings.Join(lines, s)
+		dir, _ := filepath.Split(fp)
+		if dir != "" {
+			err = CreateDir(dir)
+			if err != nil {
+				return
+			}
+		}
+		if err == nil {
+			err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
 		}
 	}
 	return
