@@ -2,18 +2,19 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	nurl "net/url"
 	"strconv"
 	"strings"
 	"time"
-	"net"
-	"context"
-	"fmt"
 )
 
 const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
@@ -137,7 +138,7 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 		if len(v) != 2 {
 			return false
 		}
-		t = append(t, &http.Cookie{Name: v[0], Value: v[1],Expires:time.Now().AddDate(1,0,0),Path:"/"})
+		t = append(t, &http.Cookie{Name: v[0], Value: v[1], Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
@@ -209,4 +210,8 @@ func (i *HttpClient) GetCookiesString(url string) string {
 		return ret
 	}
 	return ""
+}
+
+func (i *HttpClient) NewRequest(method, url string, body io.Reader) (*http.Request, error) {
+	return http.NewRequest(method, url, body)
 }
