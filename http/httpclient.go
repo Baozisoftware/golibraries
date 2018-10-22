@@ -35,7 +35,7 @@ func NewHttpClient() *HttpClient {
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
 	url = AppendUrlRandom(url)
-	req, err := i.NewGetRequest(url, nil)
+	req, err := i.NewGetRequest(url)
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
