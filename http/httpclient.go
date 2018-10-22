@@ -46,11 +46,7 @@ func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
 
 func (i *HttpClient) GetBytes(url string) (bytes []byte, err error) {
 	resp, err := i.GetResp(url)
-	if err == nil {
-		defer resp.Body.Close()
-		bytes, err = ioutil.ReadAll(resp.Body)
-	}
-	return
+	return ReadRespBytes(resp)
 }
 
 func (i *HttpClient) GetString(url string) (str string, err error) {
@@ -75,11 +71,7 @@ func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err
 
 func (i HttpClient) PostBytes(url string, data []byte) (bytes []byte, err error) {
 	resp, err := i.PostResp(url, data)
-	if err == nil {
-		defer resp.Body.Close()
-		bytes, err = ioutil.ReadAll(resp.Body)
-	}
-	return
+	return ReadRespBytes(resp)
 }
 
 func (i *HttpClient) PostString(url, data string) (str string, err error) {
@@ -216,4 +208,10 @@ func AppendUrlRandom(url string) string {
 	}
 	url += "_=" + strconv.Itoa(r)
 	return url
+}
+
+func ReadRespBytes(resp *http.Response) (bytes []byte, err error) {
+	defer resp.Body.Close()
+	bytes, err = ioutil.ReadAll(resp.Body)
+	return
 }
