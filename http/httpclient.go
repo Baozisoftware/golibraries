@@ -34,15 +34,8 @@ func NewHttpClient() *HttpClient {
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
-	rand.Seed(time.Now().Unix())
-	r := rand.Int()
-	if strings.Contains(url, "?") {
-		url += "&"
-	} else {
-		url += "?"
-	}
-	url += "_=" + strconv.Itoa(r)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	url = AppendUrlRandom(url)
+	req, err := i.NewGetRequest(url, nil)
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
@@ -69,15 +62,8 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 }
 
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
-	rand.Seed(time.Now().Unix())
-	r := rand.Int()
-	if strings.Contains(url, "?") {
-		url += "&"
-	} else {
-		url += "?"
-	}
-	url += "_=" + strconv.Itoa(r)
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+	url = AppendUrlRandom(url)
+	req, err := i.NewPostRequest(url, bytes.NewReader(data))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	if err == nil {
 		if err == nil {
@@ -218,4 +204,16 @@ func (i *HttpClient) NewGetRequest(url string) (*http.Request, error) {
 
 func (i *HttpClient) NewPostRequest(url string, body io.Reader) (*http.Request, error) {
 	return http.NewRequest(http.MethodPost, url, body)
+}
+
+func AppendUrlRandom(url string) string {
+	rand.Seed(time.Now().Unix())
+	r := rand.Int()
+	if strings.Contains(url, "?") {
+		url += "&"
+	} else {
+		url += "?"
+	}
+	url += "_=" + strconv.Itoa(r)
+	return url
 }
