@@ -60,7 +60,7 @@ func GetPercentageString(v, m, a int, s bool) string {
 }
 
 func StringIndexOf(src, sub string, i int) int {
-	if i < len(src) {
+	if i < 0 || i > len(src)-1 {
 		return -1
 	}
 	return strings.Index(src[i:], sub)
