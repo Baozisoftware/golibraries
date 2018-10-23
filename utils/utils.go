@@ -1,9 +1,12 @@
 package utils
 
-import "time"
 import (
-	"math/rand"
+	"strings"
+	"time"
+)
+import (
 	"fmt"
+	"math/rand"
 	"strconv"
 )
 
@@ -54,4 +57,11 @@ func GetPercentageString(v, m, a int, s bool) string {
 		return fmt.Sprintf(f, x) + "%"
 	}
 	return fmt.Sprintf(f, x)
+}
+
+func StringIndexOf(src, sub string, i int) int {
+	if i < len(src) {
+		return -1
+	}
+	return strings.Index(src[i:], sub)
 }
