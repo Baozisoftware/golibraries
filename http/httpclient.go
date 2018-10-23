@@ -213,7 +213,9 @@ func AppendUrlRandom(url string) string {
 }
 
 func ReadRespBytes(resp *http.Response) (bytes []byte, err error) {
-	defer resp.Body.Close()
-	bytes, err = ioutil.ReadAll(resp.Body)
+	if resp != nil {
+		defer resp.Body.Close()
+		bytes, err = ioutil.ReadAll(resp.Body)
+	}
 	return
 }
