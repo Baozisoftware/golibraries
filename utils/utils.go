@@ -63,5 +63,9 @@ func StringIndexOf(src, sub string, i int) int {
 	if i < 0 || i > len(src)-1 {
 		return -1
 	}
-	return strings.Index(src[i:], sub)
+	x := strings.Index(src[i:], sub) + i
+	if x < i {
+		return -1
+	}
+	return x
 }
