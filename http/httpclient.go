@@ -60,7 +60,9 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
 	url = AppendUrlRandom(url)
 	req, err := i.NewPostRequest(url, bytes.NewReader(data))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
