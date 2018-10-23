@@ -114,7 +114,7 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 	for _, c := range cks {
 		v := strings.Split(c, "=")
 		if len(v) != 2 {
-			return false
+			continue
 		}
 		t = append(t, &http.Cookie{Name: v[0], Value: v[1], Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
 	}
