@@ -60,9 +60,6 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
 	url = AppendUrlRandom(url)
 	req, err := i.NewPostRequest(url, bytes.NewReader(data))
-	if req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	}
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
@@ -131,6 +128,9 @@ func (i *HttpClient) SetCookie(url, name, value string) bool {
 func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", ua)
+	}
+	if req.Method == http.MethodPost && req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	resp, err = i.client.Do(req)
 	return
