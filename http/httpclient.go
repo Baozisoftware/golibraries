@@ -34,7 +34,6 @@ func NewHttpClient() *HttpClient {
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
-	url = AppendUrlRandom(url)
 	req, err := NewGetRequest(url)
 	if err == nil {
 		if err == nil {
@@ -58,7 +57,6 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 }
 
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
-	url = AppendUrlRandom(url)
 	req, err := NewPostRequest(url, bytes.NewReader(data))
 	if err == nil {
 		if err == nil {
