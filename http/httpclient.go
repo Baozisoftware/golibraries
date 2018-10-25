@@ -35,7 +35,7 @@ func NewHttpClient() *HttpClient {
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
 	url = AppendUrlRandom(url)
-	req, err := i.NewGetRequest(url)
+	req, err := NewGetRequest(url)
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
@@ -59,7 +59,7 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
 	url = AppendUrlRandom(url)
-	req, err := i.NewPostRequest(url, bytes.NewReader(data))
+	req, err := NewPostRequest(url, bytes.NewReader(data))
 	if err == nil {
 		if err == nil {
 			resp, err = i.Do(req)
@@ -192,11 +192,11 @@ func (i *HttpClient) GetCookiesString(url string) string {
 	return ""
 }
 
-func (i *HttpClient) NewGetRequest(url string) (*http.Request, error) {
+func NewGetRequest(url string) (*http.Request, error) {
 	return http.NewRequest(http.MethodGet, url, nil)
 }
 
-func (i *HttpClient) NewPostRequest(url string, body io.Reader) (*http.Request, error) {
+func NewPostRequest(url string, body io.Reader) (*http.Request, error) {
 	return http.NewRequest(http.MethodPost, url, body)
 }
 
