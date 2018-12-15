@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
@@ -256,4 +257,12 @@ func WriteAllLinesToFile(fp string, lines []string) (err error) {
 		}
 	}
 	return
+}
+
+func UnixTimeBySeconds(s int64) time.Time {
+	return time.Unix(s, 0)
+}
+
+func UnixTimeByMilliseconds(ms int64) time.Time {
+	return time.Unix(0, ms*int64(time.Millisecond))
 }
