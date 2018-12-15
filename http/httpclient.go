@@ -108,13 +108,13 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 		return false
 	}
 	t := make([]*http.Cookie, 0)
-	cks := strings.Split(cookies, ";")
+	cks := strings.Split(cookies, "; ")
 	for _, c := range cks {
 		v := strings.Split(c, "=")
-		if len(v) != 2 {
+		if len(v) < 2 {
 			continue
 		}
-		t = append(t, &http.Cookie{Name: v[0], Value: v[1], Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
+		t = append(t, &http.Cookie{Name: v[0], Value: strings.Join(v[1:],""), Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
@@ -133,8 +133,7 @@ func (i *HttpClient) SetCookiesByJson(url, data string) bool {
 	}
 	str := ""
 	for _, v := range list {
-		vv := nurl.QueryEscape(v.Value)
-		str += fmt.Sprintf("%s=%s;", v.Name, vv)
+		str += fmt.Sprintf("%s=%s; ", v.Name, v.Value)
 	}
 	return i.SetCookies(url, str)
 }
