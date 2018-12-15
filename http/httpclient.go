@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -117,6 +118,25 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
+}
+
+type cookiesJson struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+func (i *HttpClient) SetCookiesByJson(url, data string) bool {
+	bytes := []byte(data)
+	list := make([]cookiesJson, 0)
+	if json.Unmarshal(bytes, &list) != nil {
+		return false
+	}
+	str := ""
+	for _, v := range list {
+		vv := nurl.QueryEscape(v.Value)
+		str += fmt.Sprintf("%s=%s;", v.Name, vv)
+	}
+	return i.SetCookies(url, str)
 }
 
 func (i *HttpClient) SetCookie(url, name, value string) bool {
