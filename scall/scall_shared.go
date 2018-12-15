@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"io"
 	"io/ioutil"
 	"os"
@@ -213,22 +215,34 @@ func FilterPath(path, expr string) (list []string, err error) {
 	return
 }
 
-func ReadFileAllLines(filepath string) (lines []string, err error) {
+func ReadFileAllBytes(filepath string) ([]byte, error) {
 	file, err := os.Open(filepath)
 	if err == nil {
-		data, err := ioutil.ReadAll(file)
-		if err == nil {
-			str := string(data)
-			s := ""
-			if strings.Contains(str, "\r\n") {
-				s = "\r\n"
-			} else if strings.Contains(str, "\r") {
-				s = "\r"
-			} else if strings.Contains(str, "\n") {
-				s = "\n"
-			}
-			lines = strings.Split(str, s)
+		return ioutil.ReadAll(file)
+	}
+	return []byte{}, err
+}
+
+func ReadFileAllString(filepath string) (string, error) {
+	data, err := ReadFileAllBytes(filepath)
+	if err == nil {
+		return string(data), nil
+	}
+	return "", err
+}
+
+func ReadFileAllLines(filepath string) (lines []string, err error) {
+	str, err := ReadFileAllString(filepath)
+	if err == nil {
+		s := ""
+		if strings.Contains(str, "\r\n") {
+			s = "\r\n"
+		} else if strings.Contains(str, "\r") {
+			s = "\r"
+		} else if strings.Contains(str, "\n") {
+			s = "\n"
 		}
+		lines = strings.Split(str, s)
 	}
 	return
 }
@@ -265,4 +279,14 @@ func UnixTimeBySeconds(s int64) time.Time {
 
 func UnixTimeByMilliseconds(ms int64) time.Time {
 	return time.Unix(0, ms*int64(time.Millisecond))
+}
+
+func Utf8ToGbk(str string) string {
+	result, _, _ := transform.String(simplifiedchinese.GBK.NewEncoder(), str)
+	return result
+}
+
+func GbkToUtf8(str string) string {
+	result, _, _ := transform.String(simplifiedchinese.GBK.NewDecoder(), str)
+	return result
 }
