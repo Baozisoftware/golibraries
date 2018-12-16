@@ -248,15 +248,7 @@ func ReadFileAllLines(filepath string) (lines []string, err error) {
 }
 
 func WriteAllLinesToFile(fp string, lines []string) (err error) {
-	s := "\n"
-	switch runtime.GOOS {
-	case "darwin":
-		s = "\r"
-		break
-	case "windows":
-		s = "\r\n"
-		break
-	}
+	s := NewLine()
 	data := strings.Join(lines, s)
 	dir, _ := filepath.Split(fp)
 	if dir != "" {
@@ -287,4 +279,20 @@ func Utf8ToGbk(str string) string {
 func GbkToUtf8(str string) string {
 	result, _, _ := transform.String(simplifiedchinese.GBK.NewDecoder(), str)
 	return result
+}
+
+var newLine = func()string {
+	s := "\n"
+	switch runtime.GOOS {
+	case "darwin":
+		s = "\r"
+		break
+	case "windows":
+		s = "\r\n"
+		break
+	}
+	return s
+}()
+func NewLine() string {
+	return newLine
 }
