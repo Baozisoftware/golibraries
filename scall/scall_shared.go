@@ -248,27 +248,25 @@ func ReadFileAllLines(filepath string) (lines []string, err error) {
 }
 
 func WriteAllLinesToFile(fp string, lines []string) (err error) {
+	s := "\n"
+	switch runtime.GOOS {
+	case "darwin":
+		s = "\r"
+		break
+	case "windows":
+		s = "\r\n"
+		break
+	}
+	data := strings.Join(lines, s)
+	dir, _ := filepath.Split(fp)
+	if dir != "" {
+		err = CreateDir(dir)
+		if err != nil {
+			return
+		}
+	}
 	if err == nil {
-		s := "\n"
-		switch runtime.GOOS {
-		case "darwin":
-			s = "\r"
-			break
-		case "windows":
-			s = "\r\n"
-			break
-		}
-		data := strings.Join(lines, s)
-		dir, _ := filepath.Split(fp)
-		if dir != "" {
-			err = CreateDir(dir)
-			if err != nil {
-				return
-			}
-		}
-		if err == nil {
-			err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
-		}
+		err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
 	}
 	return
 }
