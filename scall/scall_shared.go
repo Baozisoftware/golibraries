@@ -231,13 +231,11 @@ func ReadFileAllString(filepath string) (string, error) {
 func ReadFileAllLines(filepath string) (lines []string, err error) {
 	str, err := ReadFileAllString(filepath)
 	if err == nil {
-		s := ""
+		s := "\n"
 		if strings.Contains(str, "\r\n") {
 			s = "\r\n"
 		} else if strings.Contains(str, "\r") {
 			s = "\r"
-		} else if strings.Contains(str, "\n") {
-			s = "\n"
 		}
 		lines = strings.Split(str, s)
 	}
