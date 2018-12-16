@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -68,4 +71,38 @@ func StringIndexOf(src, sub string, i int) int {
 		return -1
 	}
 	return x
+}
+
+func UnixTimeBySeconds(s int64) time.Time {
+	return time.Unix(s, 0)
+}
+
+func UnixTimeByMilliseconds(ms int64) time.Time {
+	return time.Unix(0, ms*int64(time.Millisecond))
+}
+
+func Utf8ToGbk(str string) string {
+	result, _, _ := transform.String(simplifiedchinese.GBK.NewEncoder(), str)
+	return result
+}
+
+func GbkToUtf8(str string) string {
+	result, _, _ := transform.String(simplifiedchinese.GBK.NewDecoder(), str)
+	return result
+}
+
+var newLine = func()string {
+	s := "\n"
+	switch runtime.GOOS {
+	case "darwin":
+		s = "\r"
+		break
+	case "windows":
+		s = "\r\n"
+		break
+	}
+	return s
+}()
+func NewLine() string {
+	return newLine
 }
