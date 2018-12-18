@@ -3,6 +3,7 @@ package json
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -12,6 +13,13 @@ func PruseJSON(data string) *JObject {
 	var o interface{}
 	if json.Unmarshal([]byte(data), &o) == nil {
 		if m, ok := o.(map[string]interface{}); ok {
+			j := JObject(m)
+			return &j
+		} else if list, ok := o.([]interface{}); ok {
+			m := make(map[string]interface{})
+			for i, v := range list {
+				m[strconv.Itoa(i)] = v
+			}
 			j := JObject(m)
 			return &j
 		}
