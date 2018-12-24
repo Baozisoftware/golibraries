@@ -91,7 +91,7 @@ func GbkToUtf8(str string) string {
 	return result
 }
 
-var newLine = func()string {
+var newLine = func() string {
 	s := "\n"
 	switch runtime.GOOS {
 	case "darwin":
@@ -103,6 +103,11 @@ var newLine = func()string {
 	}
 	return s
 }()
+
 func NewLine() string {
 	return newLine
+}
+
+func EnableAllCPU() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 }
