@@ -142,6 +142,11 @@ func (i *HttpClient) SetCookie(url, name, value string) bool {
 	return i.SetCookies(url, fmt.Sprintf("%s=%s", name, value))
 }
 
+func (i *HttpClient) ClearCookie(url, name, value string) {
+	jar, _ := cookiejar.New(nil)
+	i.client.Jar = jar
+}
+
 func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", ua)
