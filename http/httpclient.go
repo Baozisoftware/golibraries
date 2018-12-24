@@ -114,7 +114,7 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 		if len(v) < 2 {
 			continue
 		}
-		t = append(t, &http.Cookie{Name: v[0], Value: strings.Join(v[1:],""), Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
+		t = append(t, &http.Cookie{Name: v[0], Value: strings.Join(v[1:], ""), Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
@@ -142,7 +142,7 @@ func (i *HttpClient) SetCookie(url, name, value string) bool {
 	return i.SetCookies(url, fmt.Sprintf("%s=%s", name, value))
 }
 
-func (i *HttpClient) ClearCookie(url, name, value string) {
+func (i *HttpClient) ClearCookie() {
 	jar, _ := cookiejar.New(nil)
 	i.client.Jar = jar
 }
