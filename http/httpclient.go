@@ -108,7 +108,11 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 		return false
 	}
 	t := make([]*httpbase.Cookie, 0)
-	cks := strings.Split(cookies, "; ")
+	sep := ";"
+	if strings.Contains(cookies, "; ") {
+		sep = "; "
+	}
+	cks := strings.Split(cookies, sep)
 	for _, c := range cks {
 		v := strings.Split(c, "=")
 		if len(v) < 2 {
