@@ -6,12 +6,12 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/Baozisoftware/golibraries/http/httpbase"
+	"github.com/Baozisoftware/golibraries/http/httpbase/cookiejar"
 	"io"
 	"io/ioutil"
 	"math/rand"
 	"net"
-	"net/http"
-	"net/http/cookiejar"
 	nurl "net/url"
 	"strconv"
 	"strings"
@@ -21,20 +21,20 @@ import (
 const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
 
 type HttpClient struct {
-	client http.Client
+	client httpbase.Client
 }
 
 func NewHttpClient() *HttpClient {
-	tr := &http.Transport{
+	tr := &httpbase.Transport{
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
 		DisableCompression: true,
 	}
 	jar, _ := cookiejar.New(nil)
-	client := http.Client{Transport: tr, Jar: jar}
+	client := httpbase.Client{Transport: tr, Jar: jar}
 	return &HttpClient{client}
 }
 
-func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
+func (i *HttpClient) GetResp(url string) (resp *httpbase.Response, err error) {
 	req, err := NewGetRequest(url)
 	if err == nil {
 		if err == nil {
@@ -57,7 +57,7 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 	return
 }
 
-func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
+func (i *HttpClient) PostResp(url string, data []byte) (resp *httpbase.Response, err error) {
 	req, err := NewPostRequest(url, bytes.NewReader(data))
 	if err == nil {
 		if err == nil {
@@ -107,14 +107,14 @@ func (i *HttpClient) SetCookies(url, cookies string) bool {
 	if err != nil {
 		return false
 	}
-	t := make([]*http.Cookie, 0)
+	t := make([]*httpbase.Cookie, 0)
 	cks := strings.Split(cookies, "; ")
 	for _, c := range cks {
 		v := strings.Split(c, "=")
 		if len(v) < 2 {
 			continue
 		}
-		t = append(t, &http.Cookie{Name: v[0], Value: strings.Join(v[1:], ""), Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
+		t = append(t, &httpbase.Cookie{Name: v[0], Value: strings.Join(v[1:], ""), Expires: time.Now().AddDate(1, 0, 0), Path: "/"})
 	}
 	i.client.Jar.SetCookies(u, t)
 	return true
@@ -147,11 +147,11 @@ func (i *HttpClient) ClearCookie() {
 	i.client.Jar = jar
 }
 
-func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
+func (i *HttpClient) Do(req *httpbase.Request) (resp *httpbase.Response, err error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", ua)
 	}
-	if req.Method == http.MethodPost && req.Header.Get("Content-Type") == "" {
+	if req.Method == httpbase.MethodPost && req.Header.Get("Content-Type") == "" {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	resp, err = i.client.Do(req)
@@ -169,25 +169,25 @@ func (i *HttpClient) SetResponseHeaderTimeout(timeout int) {
 	if timeout <= 0 {
 		timeout = 0
 	}
-	i.client.Transport.(*http.Transport).ResponseHeaderTimeout = time.Second * time.Duration(timeout)
+	i.client.Transport.(*httpbase.Transport).ResponseHeaderTimeout = time.Second * time.Duration(timeout)
 }
 
 func (i *HttpClient) SetProxy(url string) {
 	if url == "" {
-		i.client.Transport.(*http.Transport).Proxy = nil
+		i.client.Transport.(*httpbase.Transport).Proxy = nil
 	} else {
 		u, err := nurl.Parse(url)
 		if err == nil {
-			i.client.Transport.(*http.Transport).Proxy = http.ProxyURL(u)
+			i.client.Transport.(*httpbase.Transport).Proxy = httpbase.ProxyURL(u)
 		} else {
-			i.client.Transport.(*http.Transport).Proxy = nil
+			i.client.Transport.(*httpbase.Transport).Proxy = nil
 		}
 	}
 }
 
 func (i *HttpClient) SetBodyTimeout(timeout int) {
 	if timeout > 0 {
-		i.client.Transport.(*http.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
+		i.client.Transport.(*httpbase.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
 			tot := time.Second * time.Duration(timeout)
 			conn, err := net.DialTimeout(netw, addr, tot)
 			if err != nil {
@@ -196,7 +196,7 @@ func (i *HttpClient) SetBodyTimeout(timeout int) {
 			return newTimeoutConn(conn, tot), nil
 		}
 	} else {
-		i.client.Transport.(*http.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
+		i.client.Transport.(*httpbase.Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
 			return net.Dial(netw, addr)
 		}
 	}
@@ -214,12 +214,12 @@ func (i *HttpClient) GetCookiesString(url string) string {
 	return ""
 }
 
-func NewGetRequest(url string) (*http.Request, error) {
-	return http.NewRequest(http.MethodGet, url, nil)
+func NewGetRequest(url string) (*httpbase.Request, error) {
+	return httpbase.NewRequest(httpbase.MethodGet, url, nil)
 }
 
-func NewPostRequest(url string, body io.Reader) (*http.Request, error) {
-	return http.NewRequest(http.MethodPost, url, body)
+func NewPostRequest(url string, body io.Reader) (*httpbase.Request, error) {
+	return httpbase.NewRequest(httpbase.MethodPost, url, body)
 }
 
 func AppendUrlRandom(url string) string {
@@ -234,7 +234,7 @@ func AppendUrlRandom(url string) string {
 	return url
 }
 
-func ReadRespBytes(resp *http.Response) (bytes []byte, err error) {
+func ReadRespBytes(resp *httpbase.Response) (bytes []byte, err error) {
 	if resp != nil {
 		defer resp.Body.Close()
 		bytes, err = ioutil.ReadAll(resp.Body)
