@@ -156,7 +156,7 @@ func (i *HttpClient) Do(req *httpbase.Request) (resp *httpbase.Response, err err
 		req.Header.Set("User-Agent", ua)
 	}
 	if req.Method == httpbase.MethodPost && req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 	}
 	resp, err = i.client.Do(req)
 	return
