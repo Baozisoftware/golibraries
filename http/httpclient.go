@@ -211,7 +211,7 @@ func (i *HttpClient) GetCookiesString(url string) string {
 	if err == nil {
 		ret := ""
 		for k, v := range cookies {
-			ret += fmt.Sprintf("%s=%s;", k, v);
+			ret += fmt.Sprintf("%s=%s; ", k, v);
 		}
 		return ret
 	}
