@@ -13,7 +13,5 @@ func GetMD5(data []byte) string {
 
 func GetMD5String(str string) string {
 	data := []byte(str)
-	hash := md5.New()
-	hash.Write(data)
-	return hex.EncodeToString(hash.Sum(nil))
+	return GetMD5(data)
 }
