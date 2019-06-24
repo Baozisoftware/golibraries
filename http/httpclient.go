@@ -245,3 +245,21 @@ func ReadRespBytes(resp *httpbase.Response) (bytes []byte, err error) {
 	}
 	return
 }
+
+func GetCookieValueByCookesHeader(cookies, name string) string {
+	sep := ";"
+	if strings.Contains(cookies, "; ") {
+		sep = "; "
+	}
+	cks := strings.Split(cookies, sep)
+	for _, c := range cks {
+		v := strings.Split(c, "=")
+		if len(v) < 2 {
+			continue
+		}
+		if v[0] == name {
+			return strings.Join(v[1:], "")
+		}
+	}
+	return ""
+}
