@@ -91,6 +91,11 @@ func GetFileMD5(path string) (string, error) {
 
 func ReadFileAllBytes(filepath string) ([]byte, error) {
 	file, err := os.Open(filepath)
+	defer func() {
+		if file != nil {
+			_ = file.Close()
+		}
+	}()
 	if err == nil {
 		return ioutil.ReadAll(file)
 	}
@@ -129,8 +134,6 @@ func WriteAllLinesToFile(fp string, lines []string) (err error) {
 			return
 		}
 	}
-	if err == nil {
-		err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
-	}
+	err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
 	return
 }
