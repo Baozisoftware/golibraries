@@ -91,11 +91,6 @@ func GetFileMD5(path string) (string, error) {
 
 func ReadFileAllBytes(filepath string) ([]byte, error) {
 	file, err := os.Open(filepath)
-	defer func() {
-		if file != nil {
-			_ = file.Close()
-		}
-	}()
 	if err == nil {
 		return ioutil.ReadAll(file)
 	}
