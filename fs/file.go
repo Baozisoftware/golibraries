@@ -122,6 +122,10 @@ func ReadFileAllLines(filepath string) (lines []string, err error) {
 func WriteAllLinesToFile(fp string, lines []string) (err error) {
 	s := utils.NewLine()
 	data := strings.Join(lines, s)
+	return WriteAllStringToFile(fp, data)
+}
+
+func WriteAllStringToFile(fp, str string) (err error) {
 	dir, _ := filepath.Split(fp)
 	if dir != "" {
 		err = CreateDir(dir)
@@ -129,6 +133,6 @@ func WriteAllLinesToFile(fp string, lines []string) (err error) {
 			return
 		}
 	}
-	err = ioutil.WriteFile(fp, []byte(data), os.ModePerm)
+	err = ioutil.WriteFile(fp, []byte(str), os.ModePerm)
 	return
 }
