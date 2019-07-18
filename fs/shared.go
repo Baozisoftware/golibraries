@@ -38,9 +38,5 @@ func CopyFileOrFolder(src, dst string) error {
 }
 
 func MoveFileOrFolder(src, dst string) error {
-	err := CopyFileOrFolder(src, dst)
-	if err != nil {
-		return err
-	}
-	return os.RemoveAll(src)
+	return os.Rename(src, dst)
 }
