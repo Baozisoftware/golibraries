@@ -16,8 +16,11 @@ func GetExecutable() (full, dir, name, ext, namewithoutext string) {
 	return
 }
 
-func CreateProcess(stdin io.Reader, stdout, stderr io.Writer, prog string, args ...string) (p *os.Process, err error) {
+func CreateProcess(stdin io.Reader, stdout, stderr io.Writer, dir, prog string, args ...string) (p *os.Process, err error) {
 	cmd := exec.Command(prog, args...)
+	if dir != "" {
+		cmd.Dir = dir
+	}
 	if stdin != nil {
 		cmd.Stdin = stdin
 	}
