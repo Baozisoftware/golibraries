@@ -2,6 +2,7 @@ package scall
 
 import (
 	"github.com/Baozisoftware/golibraries/fs"
+	"io"
 	"os"
 	"os/exec"
 )
@@ -15,8 +16,17 @@ func GetExecutable() (full, dir, name, ext, namewithoutext string) {
 	return
 }
 
-func CreateProcess(prog string, args ...string) (p *os.Process, err error) {
+func CreateProcess(stdin io.Reader, stdout, stderr io.Writer, prog string, args ...string) (p *os.Process, err error) {
 	cmd := exec.Command(prog, args...)
+	if stdin != nil {
+		cmd.Stdin = stdin
+	}
+	if stdout != nil {
+		cmd.Stdout = stdout
+	}
+	if stderr != nil {
+		cmd.Stderr = stderr
+	}
 	err = cmd.Start()
 	if err == nil {
 		p = cmd.Process
