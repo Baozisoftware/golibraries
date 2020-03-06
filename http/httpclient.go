@@ -38,9 +38,7 @@ func NewHttpClient() *HttpClient {
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
 	req, err := NewGetRequest(url)
 	if err == nil {
-		if err == nil {
-			resp, err = i.Do(req)
-		}
+		resp, err = i.Do(req)
 	}
 	return
 }
