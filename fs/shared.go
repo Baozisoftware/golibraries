@@ -19,7 +19,7 @@ func SplitFileName(p string) (dir, name, ext, namewithoutext string) {
 
 func FileOrFolderExists(path string) (exists bool, isFolder bool) {
 	f, err := os.Stat(path)
-	exists = os.IsExist(err)
+	exists = err == nil || os.IsExist(err)
 	if exists {
 		isFolder = f.IsDir()
 	}
