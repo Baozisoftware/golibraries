@@ -22,6 +22,7 @@ const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (
 
 type HttpClient struct {
 	client http.Client
+	_ua    string
 }
 
 func NewHttpClient() *HttpClient {
@@ -31,7 +32,7 @@ func NewHttpClient() *HttpClient {
 	}
 	jar, _ := cookiejar.New(nil)
 	client := http.Client{Transport: tr, Jar: jar}
-	return &HttpClient{client}
+	return &HttpClient{client, ""}
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
@@ -60,9 +61,7 @@ func (i *HttpClient) GetString(url string) (str string, err error) {
 func (i *HttpClient) PostResp(url string, data []byte) (resp *http.Response, err error) {
 	req, err := NewPostRequest(url, bytes.NewReader(data))
 	if err == nil {
-		if err == nil {
-			resp, err = i.Do(req)
-		}
+		resp, err = i.Do(req)
 	}
 	return
 }
@@ -153,7 +152,11 @@ func (i *HttpClient) ClearCookie() {
 
 func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	if req.Header.Get("User-Agent") == "" {
-		req.Header.Set("User-Agent", ua)
+		if i._ua == "" {
+			req.Header.Set("User-Agent", ua)
+		} else {
+			req.Header.Set("User-Agent", i._ua)
+		}
 	}
 	if req.Method == http.MethodPost && req.Header.Get("Content-Type") == "" {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
@@ -211,7 +214,7 @@ func (i *HttpClient) GetCookiesString(url string) string {
 	if err == nil {
 		ret := ""
 		for k, v := range cookies {
-			ret += fmt.Sprintf("%s=%s; ", k, v);
+			ret += fmt.Sprintf("%s=%s; ", k, v)
 		}
 		return ret
 	}
@@ -262,4 +265,8 @@ func GetCookieValueByCookesHeader(cookies, name string) string {
 		}
 	}
 	return ""
+}
+
+func (i *HttpClient) SetUserAgent(ua string) {
+	i._ua = ua
 }
