@@ -18,11 +18,12 @@ import (
 	"time"
 )
 
-const ua = "User-Agent:Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
+const ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
 
 type HttpClient struct {
-	client http.Client
-	_ua    string
+	client  http.Client
+	_ua     string
+	_referer string
 }
 
 func NewHttpClient() *HttpClient {
@@ -32,7 +33,7 @@ func NewHttpClient() *HttpClient {
 	}
 	jar, _ := cookiejar.New(nil)
 	client := http.Client{Transport: tr, Jar: jar}
-	return &HttpClient{client, ""}
+	return &HttpClient{client, "", ""}
 }
 
 func (i *HttpClient) GetResp(url string) (resp *http.Response, err error) {
@@ -155,6 +156,9 @@ func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 		} else {
 			req.Header.Set("User-Agent", i._ua)
 		}
+		if i._referer != "" {
+			req.Header.Set("Referer", i._referer)
+		}
 	}
 	if req.Method == http.MethodPost && req.Header.Get("Content-Type") == "" {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
@@ -267,4 +271,8 @@ func GetCookieValueByCookesHeader(cookies, name string) string {
 
 func (i *HttpClient) SetUserAgent(ua string) {
 	i._ua = ua
+}
+
+func (i *HttpClient) SetReferer(referer string) {
+	i._referer = referer
 }
