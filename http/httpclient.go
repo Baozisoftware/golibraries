@@ -21,8 +21,8 @@ import (
 const ua = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
 
 type HttpClient struct {
-	client  http.Client
-	_ua     string
+	client   http.Client
+	_ua      string
 	_referer string
 }
 
@@ -156,7 +156,7 @@ func (i *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 		} else {
 			req.Header.Set("User-Agent", i._ua)
 		}
-		if i._referer != "" {
+		if req.Header.Get("Referer") == "" && i._referer != "" {
 			req.Header.Set("Referer", i._referer)
 		}
 	}
