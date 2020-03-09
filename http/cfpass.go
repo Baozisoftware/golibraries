@@ -210,5 +210,17 @@ func (i *cfBypass) do(req *http.Request, referer string) (*http.Response, error)
 	if req.Method == http.MethodPost {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	return i.Do(req)
+	return i.HttpClient.Do(req)
+}
+
+func (i *cfBypass) Do(req *http.Request) (*http.Response, error) {
+	resp, err := i.HttpClient.Do(req)
+	if err == nil && resp.StatusCode == 503 && resp.Header.Get("Server") == "cloudflare" {
+		for x := 0; x < 5; x++ {
+			if i.Bypass() {
+				return i.HttpClient.Do(req)
+			}
+		}
+	}
+	return resp, err
 }
