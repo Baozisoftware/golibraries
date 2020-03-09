@@ -24,19 +24,21 @@ type cfBypass struct {
 }
 
 func NewCFBypass(url, proxy string) *cfBypass {
-	obj := new(cfBypass)
-	obj.HttpClient = NewHttpClient()
-	parsedUrl, err := nurl.Parse(url)
-	if err == nil {
-		parsedUrl.Scheme = "http"
-		obj.url = parsedUrl.String()
-		if proxy != "" {
-			obj.SetProxy(proxy)
-		}
-		for i := 0; i < 5; i++ {
-			obj.genUA()
-			if obj.Bypass() {
-				return obj
+	if checkNodeJSInstalled() {
+		obj := new(cfBypass)
+		obj.HttpClient = NewHttpClient()
+		parsedUrl, err := nurl.Parse(url)
+		if err == nil {
+			parsedUrl.Scheme = "http"
+			obj.url = parsedUrl.String()
+			if proxy != "" {
+				obj.SetProxy(proxy)
+			}
+			for i := 0; i < 5; i++ {
+				obj.genUA()
+				if obj.Bypass() {
+					return obj
+				}
 			}
 		}
 	}
@@ -223,4 +225,18 @@ func (i *cfBypass) Do(req *http.Request) (*http.Response, error) {
 		}
 	}
 	return resp, err
+}
+
+func checkNodeJSInstalled() bool {
+	proc := exec.Command("node", "-v")
+	result := bytes.NewBufferString("")
+	proc.Stdout = result
+	if proc.Start() == nil {
+		state, err := proc.Process.Wait()
+		if err == nil && state.Success() {
+			reg, _ := regexp.Compile(`v\d+\.\d+\.\d+`)
+			return reg.MatchString(result.String())
+		}
+	}
+	return false
 }
