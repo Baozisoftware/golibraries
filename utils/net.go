@@ -32,20 +32,47 @@ func GetIPsFromCIDR(cidr string) ([]string, error) {
 	}
 }
 
-func testConnect(m, ip string, port, timeout int) int64 {
-	t := time.Now()
-	addr := fmt.Sprintf("%s:%d", ip, port)
-	_, err := net.DialTimeout(m, addr, time.Duration(timeout)*time.Millisecond)
-	if err == nil {
-		return time.Now().Sub(t).Milliseconds()
+func testConnect(m, ip string, port, timeout, count int) (min, max, avg, out int) {
+	min = -1
+	max = -1
+	avg = -1
+	for count < 1 {
+		count = 1
 	}
-	return -1
+	sum := 0
+	c := 0
+	for i := 1; i <= count; i++ {
+		t := time.Now()
+		addr := fmt.Sprintf("%s:%d", ip, port)
+		_, err := net.DialTimeout(m, addr, time.Duration(timeout)*time.Millisecond)
+		if err == nil {
+			ms := int(time.Now().Sub(t).Milliseconds())
+			sum += ms
+			c++
+			if min == -1 {
+				min = ms
+			} else if ms < min {
+				min = ms
+			}
+			if max == -1 {
+				max = ms
+			} else if ms > max {
+				max = ms
+			}
+		} else {
+			out++
+		}
+	}
+	if c > 0 {
+		avg = sum / c
+	}
+	return
 }
 
-func TestTCP(ip string, port, timeout int) int64 {
-	return testConnect("tcp",ip,port,timeout)
+func TestTCP(ip string, port, timeout, count int) (min, max, avg, out int) {
+	return testConnect("tcp", ip, port, timeout, count)
 }
 
-func TestUDP(ip string, port, timeout int) int64 {
-	return testConnect("udp",ip,port,timeout)
+func TestUDP(ip string, port, timeout, count int) (min, max, avg, out int) {
+	return testConnect("udp", ip, port, timeout, count)
 }
