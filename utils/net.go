@@ -1,6 +1,10 @@
 package utils
 
-import "net"
+import (
+	"fmt"
+	"net"
+	"time"
+)
 
 func GetIPsFromCIDR(cidr string) ([]string, error) {
 	ip, ipNet, err := net.ParseCIDR(cidr)
@@ -26,4 +30,22 @@ func GetIPsFromCIDR(cidr string) ([]string, error) {
 	default:
 		return ips[1 : len(ips)-1], nil
 	}
+}
+
+func testConnect(m, ip string, port, timeout int) int64 {
+	t := time.Now()
+	addr := fmt.Sprintf("%s:%d", ip, port)
+	_, err := net.DialTimeout(m, addr, time.Duration(timeout)*time.Millisecond)
+	if err == nil {
+		return time.Now().Sub(t).Milliseconds()
+	}
+	return -1
+}
+
+func TestTCP(ip string, port, timeout int) int64 {
+	return testConnect("tcp",ip,port,timeout)
+}
+
+func TestUDP(ip string, port, timeout int) int64 {
+	return testConnect("udp",ip,port,timeout)
 }
