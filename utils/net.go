@@ -69,10 +69,10 @@ func testConnect(m, ip string, port, timeout, count int) (min, max, avg, out int
 	return
 }
 
-func TestTCP(ip string, port, timeout, count int) (min, max, avg, out int) {
+func TestTCPConnect(ip string, port, timeout, count int) (min, max, avg, out int) {
 	return testConnect("tcp", ip, port, timeout, count)
 }
 
-func TestUDP(ip string, port, timeout, count int) (min, max, avg, out int) {
+func TestUDPConnect(ip string, port, timeout, count int) (min, max, avg, out int) {
 	return testConnect("udp", ip, port, timeout, count)
 }
