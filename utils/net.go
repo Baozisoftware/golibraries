@@ -44,7 +44,7 @@ func testConnect(m, ip string, port, timeout, count int) (min, max, avg, out int
 	for i := 1; i <= count; i++ {
 		t := time.Now()
 		addr := fmt.Sprintf("%s:%d", ip, port)
-		_, err := net.DialTimeout(m, addr, time.Duration(timeout)*time.Millisecond)
+		conn, err := net.DialTimeout(m, addr, time.Duration(timeout)*time.Millisecond)
 		if err == nil {
 			ms := int(time.Now().Sub(t).Milliseconds())
 			sum += ms
@@ -61,6 +61,9 @@ func testConnect(m, ip string, port, timeout, count int) (min, max, avg, out int
 			}
 		} else {
 			out++
+		}
+		if conn != nil {
+			_ = conn.Close()
 		}
 	}
 	if c > 0 {
