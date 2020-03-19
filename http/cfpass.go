@@ -65,7 +65,7 @@ func (i *cfBypass) Bypass() bool {
 						arr = reg.FindStringSubmatch(body)
 						if len(arr) > 1 {
 							r := arr[1]
-							reg, _ = regexp.Compile(`input type="hidden" name="jschl_vc" value="(\S+)"/?>`)
+							reg, _ = regexp.Compile(`input type="hidden" id="jschl-vc" name="jschl_vc" value="(\S+)"/?>`)
 							arr = reg.FindStringSubmatch(body)
 							if len(arr) > 1 {
 								jschl_vc := arr[1]
