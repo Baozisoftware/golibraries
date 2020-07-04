@@ -56,7 +56,7 @@ func (i *cfBypass) Bypass() bool {
 				parsedUrl, err := nurl.Parse(i.url)
 				if err == nil {
 					domain := parsedUrl.Hostname()
-					reg, _ := regexp.Compile(`<form id="challenge-form" action="(\S+)" method="POST" enctype="\S+">`)
+					reg, _ := regexp.Compile(`<form class="challenge-form" id="challenge-form" action="(\S+)" method="POST" enctype="\S+">`)
 					arr := reg.FindStringSubmatch(body)
 					if len(arr) > 1 {
 						action := arr[1]
@@ -65,7 +65,7 @@ func (i *cfBypass) Bypass() bool {
 						arr = reg.FindStringSubmatch(body)
 						if len(arr) > 1 {
 							r := arr[1]
-							reg, _ = regexp.Compile(`input type="hidden" id="jschl-vc" name="jschl_vc" value="(\S+)"/?>`)
+							reg, _ = regexp.Compile(`input type="hidden" value="(\S+)" id="jschl-vc" name="jschl_vc"/?>`)
 							arr = reg.FindStringSubmatch(body)
 							if len(arr) > 1 {
 								jschl_vc := arr[1]
@@ -77,11 +77,11 @@ func (i *cfBypass) Bypass() bool {
 									arr = reg.FindStringSubmatch(body)
 									if len(arr) > 1 {
 										k := arr[1]
-										reg, _ = regexp.Compile(fmt.Sprintf(`<div style="display:none;visibility:hidden;" id="%s">(\S+)</div>`, k))
+										reg, _ = regexp.Compile(fmt.Sprintf(`<div id="%s\d">(\S+)</div>`, k))
 										arr = reg.FindStringSubmatch(body)
 										if len(arr) > 1 {
 											innerHTML := arr[1]
-											reg, _ = regexp.Compile(`setTimeout\(function\(\)\{\n([\S\s]+'; \d+')\n[\S\s]+}, (\d+)`)
+											reg, _ = regexp.Compile(`setTimeout\(function\(\)\{\n([\S\s]+'; \d+')\n[\S\s]+\},(\d+)`)
 											arr = reg.FindStringSubmatch(body)
 											if len(arr) > 2 {
 												challenge, _ms := arr[1], arr[2]
@@ -94,6 +94,7 @@ var document = {
         return { "innerHTML": "%s" };
     }
 };
+function setInterval (a,b) {}
 %s; a.value
     `, domain, innerHTML, challenge)
 												challenge = base64.StdEncoding.EncodeToString([]byte(challenge))
@@ -125,7 +126,7 @@ process.stdout.write(String(
 														if err == nil {
 															time.Sleep(time.Duration(ms) * time.Millisecond)
 															jschl_answer := result.String()
-															_url := fmt.Sprintf("http://%s/%s", domain, action)
+															_url := fmt.Sprintf("http://%s%s", domain, action)
 															r := nurl.QueryEscape(r)
 															jschl_vc = nurl.QueryEscape(jschl_vc)
 															body := fmt.Sprintf("r=%s&jschl_vc=%s&pass=%s&jschl_answer=%s", r, jschl_vc, pass, jschl_answer)
