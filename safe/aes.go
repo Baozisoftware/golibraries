@@ -1,9 +1,9 @@
 package safe
 
 import (
-	"crypto/cipher"
-	"crypto/aes"
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"encoding/base64"
 )
 
