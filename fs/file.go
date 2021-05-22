@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/Baozisoftware/golibraries/utils"
+	"github.com/baozisoftware/golibraries/utils"
 	"io"
 	"io/ioutil"
 	"os"
