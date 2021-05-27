@@ -1,7 +1,7 @@
 package scall
 
 import (
-	"github.com/baozisoftware/golibraries/fs"
+	"github.com/Baozisoftware/golibraries/fs"
 	"io"
 	"os"
 	"os/exec"

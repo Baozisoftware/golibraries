@@ -1,4 +1,4 @@
-module github.com/baozisoftware/golibraries
+module github.com/Baozisoftware/golibraries
 
         go 1.16
 

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
-	"github.com/baozisoftware/golibraries/utils"
+	"github.com/Baozisoftware/golibraries/utils"
 	"html"
 	"io/ioutil"
 	"net/http"
