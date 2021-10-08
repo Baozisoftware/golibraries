@@ -28,7 +28,7 @@ func CreateFile(fp string) (file *os.File, err error) {
 }
 
 func OpenFile(filepath string) (file *os.File, err error) {
-	file, err = os.Open(filepath)
+	file, err = os.OpenFile(filepath, os.O_RDWR, os.ModePerm)
 	if err != nil {
 		file, err = CreateFile(filepath)
 	}
