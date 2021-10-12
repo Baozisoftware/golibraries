@@ -27,8 +27,12 @@ func CreateFile(fp string) (file *os.File, err error) {
 	return
 }
 
-func OpenFile(filepath string) (file *os.File, err error) {
-	file, err = os.OpenFile(filepath, os.O_RDWR, os.ModePerm)
+func OpenFile(filepath string, readOnly bool) (file *os.File, err error) {
+	f := os.O_RDWR
+	if readOnly {
+		f = os.O_RDONLY
+	}
+	file, err = os.OpenFile(filepath, f, os.ModePerm)
 	if err != nil {
 		file, err = CreateFile(filepath)
 	}
@@ -47,12 +51,12 @@ func copyFile(src, dst string) error {
 		_, n, _, _ = SplitFileName(src)
 		dst = fmt.Sprintf("%s/%s", dst, n)
 	}
-	sf, err := OpenFile(src)
+	sf, err := OpenFile(src, true)
 	if err != nil {
 		return err
 	}
 	defer sf.Close()
-	df, err := OpenFile(dst)
+	df, err := OpenFile(dst, false)
 	if err != nil {
 		return err
 	}
@@ -70,7 +74,7 @@ func GetFileMD5(path string) (string, error) {
 	if f {
 		return "", errors.New("path is not file")
 	}
-	file, err := OpenFile(path)
+	file, err := OpenFile(path, true)
 	if err != nil {
 		return "", err
 	}
