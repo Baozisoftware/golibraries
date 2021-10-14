@@ -28,7 +28,7 @@ func CreateFile(fp string) (file *os.File, err error) {
 }
 
 func OpenFile(filepath string, readOnly bool) (file *os.File, err error) {
-	f := os.O_RDWR
+	f := os.O_RDWR | os.O_CREATE
 	if readOnly {
 		f = os.O_RDONLY
 	}
